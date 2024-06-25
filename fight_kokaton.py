@@ -25,6 +25,32 @@ def check_bound(obj_rct: pg.Rect) -> tuple[bool, bool]:
     return yoko, tate
 
 
+class Explosion:
+    """
+    3.爆発エフェクトを表示するクラス
+    """
+    f = True
+    def __init__(self, bomb: pg.Rect):
+        """
+        イニシャライザー
+        引数：爆弾Rect
+        """
+        self.img = [pg.image.load("fig/explosion.gif"), pg.transform.flip(pg.image.load("fig/explosion.gif"), True, True)]
+        self.img_rct = [self.img[0].get_rect(), self.img[1].get_rect()]
+        for i in range(len(self.img_rct)):
+            self.img_rct[i].center = bomb.rct.center
+        self.life = 5
+    def update(self, screen: pg.Surface):
+        self.life -= 1
+        if self.life > 0:
+            if Exception.f:
+                screen.blit(self.img[0], self.img_rct[0])
+                Exception.f = False
+            else:
+                screen.blit(self.img[1], self.img_rct[1])
+                Exception.f = True
+    
+
 class Score:
     """
     1.スコアを表示するクラス
@@ -170,6 +196,7 @@ def main():
     tmr = 0
     # beam = None
     beams = []
+    explosions = []
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -202,19 +229,24 @@ def main():
                         bombs[i] = None
                         bird.change_img(6, screen)  # こうかとんが喜ぶエフェクト
                         score.score += 1
+                        explosions.append(Exception(bomb))  # explosionクラスのインスタンスをリストに追加
+        print(explosions)
         bombs = [bomb for bomb in bombs if bomb is not None]  # 要素がNoneでないものだけのリストに更新
         beams = [beam for beam in beams if (beam is not None)]  # 要素がNoneでないものだけのリストに更新
         beams = [beam for beam in beams if beam.rct.right  <= WIDTH]  # 要素が画面の範囲内だけのリストに更新
+        explosions = [explosion for explosion in explosions if explosion.life > 0]  # 要素がlifeが0より大きいインスタンスだけのリストに更新
         score.update(screen)
+        for explosion in explosions:
+            explosion.update(screen)  # 爆発エフェクトのupdate
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
         for beam in beams:
             if beam is not None:
-                beam.update(screen)  # 爆弾のupdate 
+                beam.update(screen)  # ビームのupdate 
         for bomb in bombs:
             if bomb is not None:
-                bomb.update(screen)
-        pg.display.update()  # ビームのupdate
+                bomb.update(screen)  # 爆弾のupdate
+        pg.display.update()
         tmr += 1
         clock.tick(50)
 
