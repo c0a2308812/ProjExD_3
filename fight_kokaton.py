@@ -25,6 +25,23 @@ def check_bound(obj_rct: pg.Rect) -> tuple[bool, bool]:
     return yoko, tate
 
 
+class Score:
+    """
+    1.スコアを表示するクラス
+    """
+    def __init__(self):
+        self.fonto = pg.font.SysFont("hgp創英角ﾎﾟｯﾌﾟ体", 30)
+        self.fill = (0, 0, 255)
+        self.score = 0
+        self.img = self.fonto.render("スコア：" + str(self.score), 0, self.fill)
+        self.img_rct = self.img.get_rect()
+        self.img_rct.center = (100, HEIGHT-50)
+        
+    def update(self, screen: pg.Surface):
+        self.img = self.fonto.render("スコア：" + str(self.score), 0, self.fill)
+        screen.blit(self.img, self.img_rct)
+
+
 class Bird:
     """
     ゲームキャラクター（こうかとん）に関するクラス
@@ -148,6 +165,7 @@ def main():
     bird = Bird((300, 200))
     # bomb = Bomb((255, 0, 0), 10)
     bombs = [Bomb((255, 0, 0), 10) for _ in range(NUM_OF_BOMBS)]
+    score = Score()
     clock = pg.time.Clock()
     tmr = 0
     beam = None
@@ -180,8 +198,10 @@ def main():
                     beam = None
                     bombs[i] = None
                     bird.change_img(6, screen)  # こうかとんが喜ぶエフェクト
+                    score.score += 1
         bombs = [bomb for bomb in bombs if bomb is not None]  # 要素がNoneでないものだけのリストに更新
 
+        score.update(screen)
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
         if beam is not None:
