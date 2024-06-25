@@ -137,7 +137,7 @@ class Bomb:
         引数1 color：爆弾円の色タプル
         引数2 rad：爆弾円の半径
         """
-        self.img = pg.Surface((2*rad, 2*rad))
+        self.img = pg.Surface((2*rad, 2*rad))  # 爆弾円の半径×2(直径)の大きさのサーフェイスを作る
         pg.draw.circle(self.img, color, (rad, rad), rad)
         self.img.set_colorkey((0, 0, 0))
         self.rct = self.img.get_rect()
